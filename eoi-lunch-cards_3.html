@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot Take or Heartfelt? — EOI Fi de Curs</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --silly: #FF6B6B;
+    --warm:  #FF922B;
+    --edgy:  #845EF7;
+    --bonus: #2DB87A;
+    --bg:    #FFF8F0;
+    --ink:   #1A1220;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    overflow-x: hidden; position: relative;
+  }
+
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 15% 10%, rgba(255,107,107,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 85% 80%, rgba(132,94,247,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,146,43,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background-image: radial-gradient(circle, rgba(26,18,32,0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .deco-wave {
+    position: fixed; bottom: -20px; left: 0; right: 0;
+    height: 100px; opacity: 0.13; pointer-events: none; z-index: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    position: relative; z-index: 1;
+    text-align: center; padding: 38px 24px 0;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .title-emoji {
+    font-size: 50px; display: block; margin-bottom: 4px;
+    animation: floatEmoji 5s ease-in-out infinite;
+  }
+
+  @keyframes floatEmoji {
+    0%,100% { transform: translateY(0) rotate(-3deg); }
+    50%      { transform: translateY(-7px) rotate(3deg); }
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.9rem, 5vw, 2.9rem);
+    font-weight: 900; color: var(--ink);
+    line-height: 1.05; letter-spacing: -0.02em;
+  }
+
+  h1 em { font-style: italic; color: var(--warm); }
+
+  .subtitle {
+    margin-top: 6px; font-size: 0.88rem;
+    color: rgba(26,18,32,0.42);
+  }
+
+  /* ── Card area ── */
+  .card-area {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 640px;
+    padding: 28px 20px 0;
+    animation: fadeUp 0.5s 0.15s ease both;
+  }
+
+  .card {
+    background: white; border-radius: 24px;
+    padding: 44px 38px; min-height: 320px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    border: 2px solid rgba(26,18,32,0.07);
+    box-shadow: 0 8px 40px rgba(26,18,32,0.10), 0 2px 8px rgba(26,18,32,0.05);
+    position: relative; overflow: hidden;
+  }
+
+  .card-tap-cover {
+    position: absolute; inset: 0; cursor: pointer; z-index: 2;
+    -webkit-tap-highlight-color: transparent; border-radius: 24px;
+  }
+
+  .card.revealed .card-tap-cover { display: none; }
+
+  .card-accent {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 7px; border-radius: 22px 22px 0 0;
+    transition: background 0.3s ease;
+  }
+
+  .card-deco {
+    position: absolute; bottom: -16px; right: 12px;
+    font-family: 'Fraunces', serif;
+    font-size: 128px; font-weight: 900; line-height: 1;
+    color: var(--ink); opacity: 0.04;
+    pointer-events: none; user-select: none;
+  }
+
+  .card.is-bonus { background: linear-gradient(135deg,#ffffff 0%,#f0fff8 100%); }
+
+  /* Finale card — special warm closing treatment */
+  .card.is-finale {
+    background: linear-gradient(135deg, #fff5fb 0%, #fff0e6 60%, #fef8ee 100%);
+    border-color: rgba(232,69,155,0.2);
+    box-shadow: 0 10px 50px rgba(232,69,155,0.18), 0 2px 10px rgba(26,18,32,0.06);
+  }
+  .card.is-finale .card-accent {
+    background: linear-gradient(90deg, #E8459B 0%, #FF922B 100%) !important;
+    height: 9px;
+  }
+  .card.is-finale .q-text { color: #1A1220; }
+  .finale-badge {
+    display: none; align-items: center; gap: 6px;
+    background: rgba(232,69,155,0.12); color: #E8459B;
+    border-radius: 50px; padding: 5px 16px;
+    font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .card.is-finale .finale-badge { display: flex; }
+  .card.is-finale .q-tag, .card.is-finale .bonus-badge { display: none; }
+
+  /* Seen marker — appears when revisiting an already-revealed card */
+  .seen-marker {
+    position: absolute;
+    top: 16px; left: 16px;
+    display: none;
+    align-items: center; gap: 5px;
+    background: rgba(26,18,32,0.06);
+    color: rgba(26,18,32,0.45);
+    border-radius: 50px;
+    padding: 4px 11px 4px 8px;
+    font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    z-index: 3;
+    animation: seenPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .seen-marker .check {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border-radius: 50%;
+    background: var(--bonus); color: white;
+    font-size: 0.62rem; line-height: 1;
+  }
+  .card.is-seen .seen-marker { display: inline-flex; }
+
+  @keyframes seenPop {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .face-cover {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px; position: relative; z-index: 1;
+  }
+
+  .cover-tag {
+    font-size: 0.73rem; font-weight: 600;
+    letter-spacing: 0.11em; text-transform: uppercase;
+    padding: 4px 13px; border-radius: 50px; margin-bottom: 2px;
+  }
+
+  .cover-emoji {
+    font-size: 78px; line-height: 1;
+    animation: floatCard 6s ease-in-out infinite;
+  }
+
+  @keyframes floatCard {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+
+  .cover-hint {
+    font-size: 0.84rem; color: rgba(26,18,32,0.36);
+    font-style: italic; margin-top: 2px;
+  }
+
+  .face-question {
+    display: none; flex-direction: column;
+    align-items: center; gap: 16px; position: relative; z-index: 1;
+  }
+
+  .card.revealed .face-cover    { display: none; }
+  .card.revealed .face-question { display: flex; }
+
+  .q-tag {
+    font-size: 0.71rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 50px;
+  }
+
+  .bonus-badge {
+    display: none; align-items: center; gap: 6px;
+    background: rgba(45,184,122,0.12); color: var(--bonus);
+    border-radius: 50px; padding: 5px 14px;
+    font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  .card.is-bonus .bonus-badge { display: flex; }
+  .card.is-bonus .q-tag       { display: none; }
+
+  .q-text {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.15rem, 3vw, 1.55rem);
+    font-weight: 700; color: var(--ink);
+    line-height: 1.38; letter-spacing: -0.01em;
+  }
+
+  .q-prompt {
+    font-size: 0.85rem; color: rgba(26,18,32,0.42);
+    font-style: italic; line-height: 1.5; max-width: 330px;
+  }
+
+  /* "Read aloud" cue on revealed cards */
+  .read-cue {
+    display: none;
+    margin-top: 4px;
+    font-size: 0.76rem;
+    color: rgba(26,18,32,0.3);
+    font-weight: 500;
+  }
+  .card.revealed .read-cue { display: block; }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes revealPop {
+    0%   { transform: scale(0.97); }
+    55%  { transform: scale(1.022); }
+    100% { transform: scale(1); }
+  }
+  @keyframes bonusEntry {
+    0%   { transform: scale(0.93) rotate(-1deg); opacity: 0; }
+    60%  { transform: scale(1.03) rotate(0.4deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .card.anim-in     { animation: cardIn     0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .card.anim-reveal { animation: revealPop  0.28s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .card.anim-bonus  { animation: bonusEntry 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+  /* ── Controls ── */
+  .controls {
+    position: relative; z-index: 1;
+    display: flex; gap: 10px; align-items: center; justify-content: center;
+    padding: 18px 20px 0;
+    animation: fadeUp 0.5s 0.25s ease both;
+  }
+
+  .btn {
+    padding: 13px 28px; border: none; border-radius: 50px;
+    font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn:active { transform: scale(0.94); }
+
+  .btn-next {
+    background: var(--ink); color: white;
+    font-size: 1rem; padding: 14px 38px;
+    box-shadow: 0 4px 18px rgba(26,18,32,0.22);
+  }
+  .btn-next:hover { box-shadow: 0 6px 26px rgba(26,18,32,0.32); }
+
+  .btn-shuffle {
+    background: rgba(26,18,32,0.08);
+    color: rgba(26,18,32,0.65);
+    font-size: 0.88rem; padding: 13px 20px;
+  }
+
+  .btn-back {
+    background: rgba(26,18,32,0.08);
+    color: rgba(26,18,32,0.65);
+    font-size: 0.88rem; padding: 13px 20px;
+  }
+  .btn-back:disabled {
+    opacity: 0.35; cursor: not-allowed;
+  }
+  .btn-back:disabled:active { transform: none; }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 640px;
+    padding: 12px 20px 0;
+    animation: fadeUp 0.5s 0.25s ease both;
+  }
+
+  .progress-bar-bg {
+    height: 4px; background: rgba(26,18,32,0.08);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 99px; background: var(--ink);
+    transition: width 0.4s ease, background 0.3s ease; width: 0%;
+  }
+  .counter {
+    text-align: center; font-size: 0.78rem;
+    color: rgba(26,18,32,0.3); padding: 6px 0 0;
+    font-weight: 500; min-height: 22px;
+  }
+
+  /* ── Rules ── */
+  .rules {
+    position: relative; z-index: 1;
+    max-width: 640px; width: 100%;
+    padding: 18px 20px 48px;
+    animation: fadeUp 0.5s 0.35s ease both;
+  }
+
+  .rules-inner {
+    background: rgba(255,255,255,0.52);
+    border: 1.5px solid rgba(26,18,32,0.07);
+    border-radius: 18px; padding: 16px 20px;
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 14px; backdrop-filter: blur(6px);
+  }
+
+  .rule-label {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: rgba(26,18,32,0.35); margin-bottom: 3px;
+  }
+  .rule-text { font-size: 0.84rem; color: rgba(26,18,32,0.62); line-height: 1.42; }
+
+  .confetti-piece { position: fixed; pointer-events: none; z-index: 9999; }
+
+  @media (max-width: 520px) {
+    h1 { font-size: 1.7rem; }
+    .rules-inner { grid-template-columns: 1fr; }
+    .card { padding: 36px 24px; min-height: 280px; }
+    .q-text { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<svg class="deco-wave" viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0,50 C240,100 480,0 720,50 C960,100 1200,0 1440,50 L1440,100 L0,100 Z" fill="#FF922B"/>
+</svg>
+
+<header>
+  <span class="title-emoji">🌊</span>
+  <h1>Hot Take<br>or <em>Heartfelt?</em></h1>
+  <p class="subtitle">EOI Fi de Curs · Edició Platja · Pick a card. Say something true.</p>
+</header>
+
+<div class="card-area">
+  <div class="card" id="card">
+    <div class="card-tap-cover" onclick="revealCard()"></div>
+    <div class="card-accent" id="cardAccent"></div>
+    <div class="card-deco"   id="cardDeco">1</div>
+    <span class="seen-marker"><span class="check">✓</span> Ja vista</span>
+
+    <div class="face-cover">
+      <span class="cover-tag"   id="coverTag">Mix</span>
+      <span class="cover-emoji" id="coverEmoji">🎲</span>
+      <span class="cover-hint">Toca per revelar la pregunta</span>
+    </div>
+
+    <div class="face-question">
+      <span class="q-tag"      id="qTag"></span>
+      <span class="bonus-badge">✨ Activitat de grup</span>
+      <span class="finale-badge">🥂 L'última carta</span>
+      <p    class="q-text"     id="qText"></p>
+      <p    class="q-prompt"   id="qPrompt"></p>
+      <span class="read-cue">Llegeix-la en veu alta i passa el mòbil →</span>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn btn-back"    id="backBtn" onclick="prevCard()" disabled>← Enrere</button>
+  <button class="btn btn-shuffle" onclick="shuffleDeck()">🔀 Shuffle</button>
+  <button class="btn btn-next"    onclick="nextCard()">Next card →</button>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+  <div class="counter" id="counter"></div>
+</div>
+
+<div class="rules">
+  <div class="rules-inner">
+    <div>
+      <div class="rule-label">How to play</div>
+      <div class="rule-text">Una persona llegeix la carta en veu alta, respon, i passa el mòbil al costat. Qui rep el mòbil tria la següent.</div>
+    </div>
+    <div>
+      <div class="rule-label">House rule</div>
+      <div class="rule-text">Passar sempre és vàlid — però passar obliga a fer una pregunta al grup.</div>
+    </div>
+    <div>
+      <div class="rule-label">Secret rule</div>
+      <div class="rule-text">Si tothom riu o tothom calla, és una bona carta. Recorda-la.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const REGULAR = [
+  { q: "Si aquest curs fos una pel·lícula, de quin gènere seria? I quin títol tindria?", p: "Gènere, títol i, si cal, director/a.", e: "🎬", mode: "silly" },
+  { q: "Quina paraula, en qualsevol idioma, et sembla més ridícula o et costa més de pronunciar?", p: "", e: "🤫", mode: "silly" },
+  { q: "Quina és la situació més surrealista que t'ha passat a la feina aquest curs?", p: "", e: "🌀", mode: "silly" },
+  { q: "Si el teu lloc de treball tingués ressenyes a Google, què diria la més divertida?", p: "Sigues honest/a. Estem entre amics.", e: "⭐", mode: "silly" },
+  { q: "Quin personatge de ficció seria el pitjor company o companya de feina? Per què?", p: "", e: "🎭", mode: "silly" },
+  { q: "Quina cosa fas a la feina que sembla molt fàcil però que, en realitat, és força complicada?", p: "", e: "🙃", mode: "silly" },
+  { q: "Si la teva manera de treballar fos un còctel, com es diria i quins ingredients portaria?", p: "", e: "🍹", mode: "silly" },
+  { q: "Completa la frase: «Allò que deia que mai faria a la feina i que ara faig cada setmana és…»", p: "", e: "🙈", mode: "silly" },
+  { q: "Quina és l'excusa més creativa que has sentit aquest curs (sigui a la feina o fora)?", p: "Punts extres per originalitat.", e: "🏆", mode: "silly" },
+  { q: "Explica en què treballes fent servir només metàfores culinàries.", p: "Sense vocabulari tècnic. Que s'entengui.", e: "🍽️", mode: "silly" },
+  { q: "Què és el que recordaràs d'aquest curs d'aquí a deu anys?", p: "Pren-te tot el temps que necessitis.", e: "💛", mode: "warm" },
+  { q: "Hi ha alguna persona de la feina a qui aquest curs hagis agafat una estima especial?", p: "Sense noms, si no vols.", e: "🌱", mode: "warm" },
+  { q: "Com nota el teu cos que avui ha estat un bon dia de feina?", p: "", e: "☀️", mode: "warm" },
+  { q: "Quan va ser l'última vegada que et vas sentir genuïnament orgullós o orgullosa d'alguna cosa que havies creat o aconseguit?", p: "", e: "🏗️", mode: "warm" },
+  { q: "Què saps ara sobre treballar aquí que t'hauria agradat saber el primer dia?", p: "", e: "📬", mode: "warm" },
+  { q: "Quina llengua que no parles t'agradaria dominar? Per què?", p: "", e: "🗺️", mode: "warm" },
+  { q: "Explica un moment d'aquest curs en què algú t'hagi sorprès positivament.", p: "T'escoltem.", e: "🦻", mode: "warm" },
+  { q: "Com seria el teu estiu ideal? Respon amb una frase sincera i una altra de completament absurda.", p: "", e: "🌊", mode: "warm" },
+  { q: "Què has après d'algú de la feina que difícilment hauries après en un altre lloc?", p: "", e: "🔄", mode: "warm" },
+  { q: "Si algú d'aquí hagués de fer el discurs a la teva festa de jubilació, qui voldries que fos? I què t'agradaria que digués?", p: "", e: "🥂", mode: "warm" },
+  { q: "Si poguessis canviar o eliminar una sola cosa del centre, quina seria?", p: "De manera constructiva. Evidentment.", e: "🔥", mode: "edgy" },
+  { q: "Quina és la mentida més gran que ens expliquem sobre el món laboral?", p: "Defensa la teva resposta.", e: "🎭", mode: "edgy" },
+  { q: "Creus que la teva feina està prou valorada? Per què?", p: "", e: "📝", mode: "edgy" },
+  { q: "Quina opinió sobre la teva feina encara no has dit mai en veu alta?", p: "", e: "🤐", mode: "edgy" },
+  { q: "Si poguessis establir una única norma sobre com ens tractem a la feina, quina seria?", p: "", e: "⚖️", mode: "edgy" },
+  { q: "Quina és la veritat més incòmoda sobre com la tecnologia està canviant la teva feina?", p: "Va. Aquí no ho escriu ningú.", e: "🤖", mode: "edgy" },
+  { q: "Existeixen els mals companys de feina o són les circumstàncies les que fan aflorar el pitjor de les persones? Defensa la teva resposta.", p: "", e: "🧩", mode: "edgy" },
+  { q: "Què és el que la gent de fora no entén sobre el que passa realment dins d'un centre com el nostre?", p: "", e: "📢", mode: "edgy" },
+  { q: "Quina «bona pràctica» del món laboral creus que està més sobrevalorada?", p: "Sigues específic/a. Sigues valent/a.", e: "💣", mode: "edgy" },
+  { q: "Tens trenta segons davant del conseller o la consellera d'Educació. Què li diries?", p: "Comença.", e: "🎤", mode: "edgy" },
+];
+
+const BONUS = [
+  { q: "Tothom a taula: una paraula per descriure aquest curs. En ordre, sense repetir.", p: "Si dues persones trien la mateixa paraula, les dues han d'explicar per què.", e: "🌀", mode: "bonus" },
+  { q: "Alça la mà si alguna vegada has fet veure que no senties el telèfon per no contestar.", p: "Qui en té la història més bona?", e: "📵", mode: "bonus" },
+  { q: "Votació ràpida: quin ha estat el millor moment col·lectiu d'aquest curs al centre? Cadascú proposa un i votem.", p: "Tres, dos, un… proposeu!", e: "🗳️", mode: "bonus" },
+  { q: "Alça la mà si has menjat de peu a la feina perquè no tenies temps.", p: "Ara alça les dues mans si ho fas habitualment.", e: "🙋", mode: "bonus" },
+];
+
+const FINALE = {
+  q: "Aixequeu la copa (o el got, o el cafè). Cadascú diu en veu alta una sola paraula: allò que desitja per a l'estiu de tothom qui seu aquí. Quan tothom hagi parlat, brindeu junts.",
+  p: "L'última carta. Que tingueu un bon estiu. 🌊",
+  e: "🥂",
+  mode: "finale"
+};
+
+const MODE_CFG = {
+  silly: { label: '😂 Silly', color: '#FF6B6B' },
+  warm:  { label: '🧡 Warm',  color: '#FF922B' },
+  edgy:  { label: '🔥 Edgy',  color: '#845EF7' },
+  bonus: { label: '✨ Bonus',  color: '#2DB87A' },
+  finale:{ label: '🥂 Final',  color: '#E8459B' },
+};
+
+const COVER_EMOJIS = {
+  silly: ['🐙','🦆','🌮','🎪','🪄','🦩','🐡','🎠','🤹','🎈'],
+  warm:  ['☀️','🌸','🍊','💛','🌿','🫶','🫐','🧡','🌻','🕊️'],
+  edgy:  ['🔥','⚡','💣','🌋','🎯','🌑','⚗️','🃏','🗡️','🌀'],
+  bonus: ['🌀','✨','🙋','🗳️','🎉','🫶','🎊','⭐'],
+  finale:['🥂','🌅','🫶','🎊','✨','🌊','🍾','💛'],
+};
+
+let deck = [], idx = 0, revealed = false, busy = false, seen = new Set();
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildDeck() {
+  const regular = shuffle([...REGULAR]);
+  const bonusCards = shuffle([...BONUS]).slice(0, 3 + Math.round(Math.random()));
+  const step = Math.floor(regular.length / (bonusCards.length + 1));
+  const result = [...regular];
+  bonusCards.forEach((card, i) => {
+    const pos = step * (i + 1) + i;
+    result.splice(Math.min(pos, result.length - 1), 0, card);
+  });
+  result.push(FINALE); // always the last card
+  deck = result; idx = 0; revealed = false; seen = new Set();
+}
+
+function render(animClass) {
+  const card    = document.getElementById('card');
+  const current = deck[idx];
+  const isBonus = current && current.mode === 'bonus';
+  const isFinale = current && current.mode === 'finale';
+  const mode    = current ? current.mode : 'silly';
+  const cfg     = MODE_CFG[mode];
+  const emojis  = COVER_EMOJIS[mode] || COVER_EMOJIS.silly;
+
+  card.classList.remove('anim-in','anim-reveal','anim-bonus','revealed','is-bonus','is-seen','is-finale');
+  void card.offsetWidth;
+
+  if (revealed)  card.classList.add('revealed');
+  if (isBonus)   card.classList.add('is-bonus');
+  if (isFinale)  card.classList.add('is-finale');
+  if (revealed && seen.has(idx)) card.classList.add('is-seen');
+  if (animClass) card.classList.add(animClass);
+
+  document.getElementById('cardAccent').style.background = cfg.color;
+  document.getElementById('cardDeco').textContent = idx + 1;
+
+  document.getElementById('coverTag').textContent = isFinale ? '🥂 L\'última carta' : (isBonus ? '✨ Activitat especial' : cfg.label);
+  document.getElementById('coverTag').style.cssText = `background:${cfg.color}1A;color:${cfg.color};`;
+  document.getElementById('coverEmoji').textContent = emojis[idx % emojis.length];
+
+  if (current) {
+    document.getElementById('qTag').textContent   = cfg.label;
+    document.getElementById('qTag').style.cssText = `background:${cfg.color}1A;color:${cfg.color};`;
+    document.getElementById('qText').textContent   = current.q;
+    document.getElementById('qPrompt').textContent = current.p || '';
+  } else {
+    card.classList.add('revealed');
+    document.getElementById('qTag').style.cssText = 'background:#1A12201A;color:#1A1220;';
+    document.getElementById('qTag').textContent   = '🎉 Fet!';
+    document.getElementById('qText').textContent  = 'Ja heu vist totes les cartes!';
+    document.getElementById('qPrompt').textContent = 'Barregeu per tornar a jugar.';
+  }
+
+  const total = deck.length;
+  const pct   = total > 0 ? ((Math.min(idx, total-1) + (revealed ? 1 : 0)) / total) * 100 : 0;
+  document.getElementById('progressFill').style.width      = pct + '%';
+  document.getElementById('progressFill').style.background = isFinale ? '#E8459B' : (isBonus ? '#2DB87A' : '#1A1220');
+  document.getElementById('counter').textContent = `Carta ${Math.min(idx+1,total)} de ${total}`;
+
+  // Back button enabled only when there's a previous card
+  document.getElementById('backBtn').disabled = (idx <= 0);
+}
+
+function revealCard() {
+  if (revealed || busy) return;
+  revealed = true;
+  const m = deck[idx] && deck[idx].mode;
+  const isBonus = m === 'bonus';
+  const isFinale = m === 'finale';
+  render(isFinale ? 'anim-bonus' : (isBonus ? 'anim-bonus' : 'anim-reveal'));
+  if (isFinale) {
+    const warm = ['#E8459B','#FF922B','#FFD93D','#FF6B6B','#FFB37B','#FF8FC7'];
+    confettiBurst(warm);
+    setTimeout(() => confettiBurst(warm), 350);
+    setTimeout(() => confettiBurst(warm), 700);
+  } else if (isBonus || (m === 'warm' && Math.random() < 0.3)) {
+    confettiBurst();
+  }
+}
+
+function nextCard() {
+  if (busy) return;
+  if (!revealed) { revealCard(); return; }
+  // The finale is the true end — stay on it
+  if (deck[idx] && deck[idx].mode === 'finale') return;
+  // Mark the current card as seen now that we're leaving it
+  seen.add(idx);
+  if (idx >= deck.length - 1) { idx = deck.length; revealed = true; render('anim-in'); return; }
+  busy = true; idx++; revealed = false;
+  const card = document.getElementById('card');
+  card.style.transition = 'opacity 0.17s ease, transform 0.17s ease';
+  card.style.opacity = '0'; card.style.transform = 'translateY(-10px)';
+  setTimeout(() => {
+    card.style.transition = card.style.opacity = card.style.transform = '';
+    const m = deck[idx] && deck[idx].mode;
+    const special = (m === 'bonus' || m === 'finale');
+    render(special ? 'anim-bonus' : 'anim-in');
+    busy = false;
+  }, 175);
+}
+
+function prevCard() {
+  if (busy || idx <= 0) return;
+  // Mark current as seen too, in case it was revealed
+  if (revealed) seen.add(idx);
+  busy = true; idx--;
+  // When going back, show the card already revealed (you've seen it)
+  revealed = seen.has(idx);
+  const card = document.getElementById('card');
+  card.style.transition = 'opacity 0.17s ease, transform 0.17s ease';
+  card.style.opacity = '0'; card.style.transform = 'translateY(10px)';
+  setTimeout(() => {
+    card.style.transition = card.style.opacity = card.style.transform = '';
+    render('anim-in');
+    busy = false;
+  }, 175);
+}
+
+function shuffleDeck() {
+  if (busy) return;
+  buildDeck();
+  const card = document.getElementById('card');
+  busy = true;
+  card.style.transition = 'transform 0.11s ease';
+  card.style.transform  = 'rotate(-2.5deg) scale(0.97)';
+  setTimeout(() => {
+    card.style.transform = 'rotate(1.5deg) scale(1.01)';
+    setTimeout(() => {
+      card.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+      card.style.transform  = '';
+      setTimeout(() => { render('anim-in'); busy = false; }, 60);
+    }, 110);
+  }, 110);
+}
+
+function confettiBurst(palette) {
+  const colors = palette || ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#FF922B','#845EF7','#2DB87A'];
+  const cx = window.innerWidth / 2, cy = window.innerHeight * 0.38;
+  for (let i = 0; i < 40; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      const sz = 5 + Math.random() * 7;
+      el.style.cssText = `width:${sz}px;height:${sz}px;background:${colors[i%colors.length]};border-radius:${Math.random()>.4?'50%':'3px'};left:${cx}px;top:${cy}px;`;
+      document.body.appendChild(el);
+      const a = Math.random()*Math.PI*2, v = 80+Math.random()*150;
+      let vx=Math.cos(a)*v, vy=Math.sin(a)*v-100, px=cx, py=cy, f=0;
+      const run=()=>{ vy+=3.8; px+=vx*.016; py+=vy*.016; el.style.left=px+'px'; el.style.top=py+'px'; el.style.opacity=Math.max(0,1-f/60); el.style.transform=`rotate(${f*8}deg)`; if(++f<65) requestAnimationFrame(run); else el.remove(); };
+      requestAnimationFrame(run);
+    }, i*11);
+  }
+}
+
+buildDeck();
+render(null);
+</script>
+</body>
+</html>
